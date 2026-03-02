@@ -14,6 +14,10 @@ set(SOURCES
     src/main.cpp
     src/MainWindow.cpp
     src/MainWindow.h
+    src/SudokuBoard.cpp
+    src/SudokuBoard.h
+    src/SudokuCell.cpp
+    src/SudokuCell.h
 )
 
 add_executable(sudoku ${SOURCES})
