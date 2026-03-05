@@ -4,8 +4,18 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QVector>
+#include <QStack>
+#include <QSet>
 
 class SudokuCell;
+
+struct SudokuMove {
+    int row;
+    int col;
+    int oldValue;
+    int newValue;
+    QSet<int> oldNotes;
+};
 
 class SudokuBoard : public QWidget
 {
@@ -16,9 +26,20 @@ public:
 
     void nuevoJuego();
     void setDificultad(int celdasVisibles);
+    void setNotasMode(bool enabled);
+    bool notasMode() const { return m_notasMode; }
+
+    bool undo();
+    bool redo();
+    bool canUndo() const { return !m_undoStack.isEmpty(); }
+    bool canRedo() const { return !m_redoStack.isEmpty(); }
+
+    void limpiarConflicto(int fila, int col, int num);
 
 signals:
     void conflictoDetectado(int fila, int col, int num);
+    void movimientoHecho();
+    void notasModeChanged(bool enabled);
 
 private slots:
     void onCeldaClicked(int row, int col);
@@ -41,6 +62,11 @@ private:
     QVector<QVector<SudokuCell*>> m_celdas;
     QGridLayout *m_gridLayout = nullptr;
     int m_celdasVisibles = 45;
+    bool m_notasMode = false;
+
+    QStack<SudokuMove> m_undoStack;
+    QStack<SudokuMove> m_redoStack;
+    static const int MAX_UNDO = 100;
 };
 
 #endif

@@ -33,6 +33,9 @@ SudokuBoard::SudokuBoard(QWidget *parent)
 
 void SudokuBoard::nuevoJuego()
 {
+    m_undoStack.clear();
+    m_redoStack.clear();
+
     generarSolucion();
     colocarPistas(m_celdasVisibles);
 
@@ -52,6 +55,49 @@ void SudokuBoard::setDificultad(int celdasVisibles)
 {
     m_celdasVisibles = celdasVisibles;
     nuevoJuego();
+}
+
+void SudokuBoard::setNotasMode(bool enabled)
+{
+    m_notasMode = enabled;
+    emit notasModeChanged(enabled);
+}
+
+bool SudokuBoard::undo()
+{
+    if (m_undoStack.isEmpty()) return false;
+
+    SudokuMove move = m_undoStack.pop();
+    m_redoStack.push(move);
+
+    auto *cell = m_celdas[move.row][move.col];
+    if (move.oldValue != 0) {
+        cell->setNumber(move.oldValue);
+    } else {
+        cell->setNumber(0);
+        cell->setNotes(move.oldNotes);
+    }
+    actualizarEstadoCelda(move.row, move.col);
+    emit movimientoHecho();
+    return true;
+}
+
+bool SudokuBoard::redo()
+{
+    if (m_redoStack.isEmpty()) return false;
+
+    SudokuMove move = m_redoStack.pop();
+    m_undoStack.push(move);
+
+    auto *cell = m_celdas[move.row][move.col];
+    if (move.newValue != 0) {
+        cell->setNumber(move.newValue);
+    } else {
+        cell->setNumber(0);
+    }
+    actualizarEstadoCelda(move.row, move.col);
+    emit movimientoHecho();
+    return true;
 }
 
 void SudokuBoard::onCeldaClicked(int row, int col)
@@ -82,14 +128,48 @@ void SudokuBoard::onNumeroIngresado(int row, int col, int num)
 
     auto *cell = m_celdas[row][col];
 
-    if (cell->number() == num) {
-        cell->setNumber(0);
-        actualizarEstadoCelda(row, col);
+    if (m_notasMode) {
+        if (cell->number() != 0) return;
+        SudokuMove move;
+        move.row = row;
+        move.col = col;
+        move.oldValue = 0;
+        move.newValue = 0;
+        move.oldNotes = cell->notes();
+
+        if (cell->hasNote(num))
+            cell->setNote(num, false);
+        else
+            cell->setNote(num, true);
+
+        m_undoStack.push(move);
+        m_redoStack.clear();
+        if (m_undoStack.size() > MAX_UNDO) m_undoStack.remove(0);
+        emit movimientoHecho();
         return;
     }
 
+    if (cell->number() == num) {
+        cell->setNumber(0);
+        actualizarEstadoCelda(row, col);
+        m_redoStack.clear();
+        emit movimientoHecho();
+        return;
+    }
+
+    SudokuMove move;
+    move.row = row;
+    move.col = col;
+    move.oldValue = cell->number();
+    move.newValue = num;
+    move.oldNotes = cell->notes();
+
     cell->setNumber(num);
     cell->clearNotes();
+
+    m_undoStack.push(move);
+    m_redoStack.clear();
+    if (m_undoStack.size() > MAX_UNDO) m_undoStack.remove(0);
 
     bool conflicto = tieneConflicto(row, col);
     cell->setConflict(conflicto);
@@ -98,6 +178,7 @@ void SudokuBoard::onNumeroIngresado(int row, int col, int num)
     }
 
     actualizarEstadoCelda(row, col);
+    emit movimientoHecho();
 }
 
 void SudokuBoard::onCeldaLimpiada(int row, int col)
@@ -106,10 +187,22 @@ void SudokuBoard::onCeldaLimpiada(int row, int col)
 
     auto *cell = m_celdas[row][col];
 
+    SudokuMove move;
+    move.row = row;
+    move.col = col;
+    move.oldValue = cell->number();
+    move.newValue = 0;
+    move.oldNotes = cell->notes();
+
     cell->setNumber(0);
     cell->setConflict(false);
 
+    m_undoStack.push(move);
+    m_redoStack.clear();
+    if (m_undoStack.size() > MAX_UNDO) m_undoStack.remove(0);
+
     actualizarEstadoCelda(row, col);
+    emit movimientoHecho();
 }
 
 void SudokuBoard::generarSolucion()
@@ -228,4 +321,11 @@ void SudokuBoard::limpiarResaltado()
     for (int i = 0; i < TAMANIO; ++i)
         for (int j = 0; j < TAMANIO; ++j)
             m_celdas[i][j]->setHighlighted(false);
+}
+
+void SudokuBoard::limpiarConflicto(int fila, int col, int num)
+{
+    auto *cell = m_celdas[fila][col];
+    cell->setConflict(false);
+    actualizarEstadoCelda(fila, col);
 }
