@@ -6,6 +6,8 @@
 #include <QVector>
 #include <QStack>
 #include <QSet>
+#include <QElapsedTimer>
+#include <QTimer>
 
 class SudokuCell;
 
@@ -34,17 +36,23 @@ public:
     bool canUndo() const { return !m_undoStack.isEmpty(); }
     bool canRedo() const { return !m_redoStack.isEmpty(); }
 
+    int tiempoTranscurrido() const;
+    bool juegoGanado() const { return m_ganado; }
+
     void limpiarConflicto(int fila, int col, int num);
 
 signals:
     void conflictoDetectado(int fila, int col, int num);
     void movimientoHecho();
+    void juegoCompletado(int tiempo);
     void notasModeChanged(bool enabled);
+    void tiempoActualizado(int segundos);
 
 private slots:
     void onCeldaClicked(int row, int col);
     void onNumeroIngresado(int row, int col, int num);
     void onCeldaLimpiada(int row, int col);
+    void onTimerTick();
 
 private:
     void generarSolucion();
@@ -52,6 +60,7 @@ private:
     bool esValidoEnTablero(const QVector<QVector<int>> &tablero, int fila, int col, int num) const;
     bool resolver(QVector<QVector<int>> &tablero);
     bool tieneConflicto(int fila, int col) const;
+    void verificarVictoria();
     void actualizarEstadoCelda(int fila, int col);
     void limpiarResaltado();
 
@@ -67,6 +76,10 @@ private:
     QStack<SudokuMove> m_undoStack;
     QStack<SudokuMove> m_redoStack;
     static const int MAX_UNDO = 100;
+
+    QElapsedTimer m_timer;
+    QTimer *m_timerTick = nullptr;
+    int m_tiempoSegundos = 0;
 };
 
 #endif

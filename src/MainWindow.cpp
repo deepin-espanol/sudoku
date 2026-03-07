@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMenuBar>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -70,6 +71,8 @@ void MainWindow::setupUI()
         m_btnUndo->setEnabled(m_board->canUndo());
         m_btnRedo->setEnabled(m_board->canRedo());
     });
+    connect(m_board, &SudokuBoard::juegoCompletado, this, &MainWindow::onJuegoCompletado);
+    connect(m_board, &SudokuBoard::tiempoActualizado, this, &MainWindow::onTiempoActualizado);
     connect(m_board, &SudokuBoard::notasModeChanged, this, [this](bool enabled) {
         m_btnNotas->setChecked(enabled);
     });
@@ -156,4 +159,25 @@ void MainWindow::onRedo()
 void MainWindow::onNotasToggle()
 {
     m_board->setNotasMode(!m_board->notasMode());
+}
+
+void MainWindow::onJuegoCompletado(int tiempo)
+{
+    int mins = tiempo / 60;
+    int segs = tiempo % 60;
+    QString timeStr = QString("%1:%2")
+        .arg(mins, 2, 10, QChar('0'))
+        .arg(segs, 2, 10, QChar('0'));
+
+    QMessageBox::information(this, tr("Sudoku Completado"),
+        tr("Felicidades! Has completado el Sudoku!\n\nTiempo: %1").arg(timeStr));
+}
+
+void MainWindow::onTiempoActualizado(int segundos)
+{
+    int mins = segundos / 60;
+    int secs = segundos % 60;
+    m_labelTimer->setText(QString("%1:%2")
+        .arg(mins, 2, 10, QChar('0'))
+        .arg(secs, 2, 10, QChar('0')));
 }

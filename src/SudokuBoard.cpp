@@ -28,11 +28,17 @@ SudokuBoard::SudokuBoard(QWidget *parent)
         }
     }
 
+    m_timerTick = new QTimer(this);
+    connect(m_timerTick, &QTimer::timeout, this, &SudokuBoard::onTimerTick);
+
     nuevoJuego();
 }
 
 void SudokuBoard::nuevoJuego()
 {
+    m_timerTick->stop();
+    m_tiempoSegundos = 0;
+    m_ganado = false;
     m_undoStack.clear();
     m_redoStack.clear();
 
@@ -49,6 +55,13 @@ void SudokuBoard::nuevoJuego()
             actualizarEstadoCelda(i, j);
         }
     }
+
+    if (!m_ganado) {
+        m_timer.start();
+        m_timerTick->start(1000);
+    }
+
+    emit tiempoActualizado(0);
 }
 
 void SudokuBoard::setDificultad(int celdasVisibles)
@@ -65,7 +78,7 @@ void SudokuBoard::setNotasMode(bool enabled)
 
 bool SudokuBoard::undo()
 {
-    if (m_undoStack.isEmpty()) return false;
+    if (m_undoStack.isEmpty() || m_ganado) return false;
 
     SudokuMove move = m_undoStack.pop();
     m_redoStack.push(move);
@@ -78,13 +91,14 @@ bool SudokuBoard::undo()
         cell->setNotes(move.oldNotes);
     }
     actualizarEstadoCelda(move.row, move.col);
+    m_ganado = false;
     emit movimientoHecho();
     return true;
 }
 
 bool SudokuBoard::redo()
 {
-    if (m_redoStack.isEmpty()) return false;
+    if (m_redoStack.isEmpty() || m_ganado) return false;
 
     SudokuMove move = m_redoStack.pop();
     m_undoStack.push(move);
@@ -96,8 +110,14 @@ bool SudokuBoard::redo()
         cell->setNumber(0);
     }
     actualizarEstadoCelda(move.row, move.col);
+    m_ganado = false;
     emit movimientoHecho();
     return true;
+}
+
+int SudokuBoard::tiempoTranscurrido() const
+{
+    return m_tiempoSegundos;
 }
 
 void SudokuBoard::onCeldaClicked(int row, int col)
@@ -124,7 +144,7 @@ void SudokuBoard::onCeldaClicked(int row, int col)
 
 void SudokuBoard::onNumeroIngresado(int row, int col, int num)
 {
-    if (m_esPista[row][col]) return;
+    if (m_ganado || m_esPista[row][col]) return;
 
     auto *cell = m_celdas[row][col];
 
@@ -179,11 +199,13 @@ void SudokuBoard::onNumeroIngresado(int row, int col, int num)
 
     actualizarEstadoCelda(row, col);
     emit movimientoHecho();
+
+    if (!conflicto) verificarVictoria();
 }
 
 void SudokuBoard::onCeldaLimpiada(int row, int col)
 {
-    if (m_esPista[row][col]) return;
+    if (m_ganado || m_esPista[row][col]) return;
 
     auto *cell = m_celdas[row][col];
 
@@ -203,6 +225,12 @@ void SudokuBoard::onCeldaLimpiada(int row, int col)
 
     actualizarEstadoCelda(row, col);
     emit movimientoHecho();
+}
+
+void SudokuBoard::onTimerTick()
+{
+    m_tiempoSegundos++;
+    emit tiempoActualizado(m_tiempoSegundos);
 }
 
 void SudokuBoard::generarSolucion()
@@ -304,6 +332,21 @@ void SudokuBoard::colocarPistas(int celdasVisibles)
         auto [f, c] = todas[k];
         m_esPista[f][c] = true;
     }
+}
+
+void SudokuBoard::verificarVictoria()
+{
+    for (int i = 0; i < TAMANIO; ++i) {
+        for (int j = 0; j < TAMANIO; ++j) {
+            auto *cell = m_celdas[i][j];
+            if (cell->number() == 0 || tieneConflicto(i, j))
+                return;
+        }
+    }
+
+    m_ganado = true;
+    m_timerTick->stop();
+    emit juegoCompletado(m_tiempoSegundos);
 }
 
 void SudokuBoard::actualizarEstadoCelda(int fila, int col)

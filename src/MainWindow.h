@@ -25,6 +25,8 @@ private slots:
     void onUndo();
     void onRedo();
     void onNotasToggle();
+    void onJuegoCompletado(int tiempo);
+    void onTiempoActualizado(int segundos);
 
 private:
     void setupUI();
