@@ -18,6 +18,7 @@ set(SOURCES
     src/SudokuBoard.h
     src/SudokuCell.cpp
     src/SudokuCell.h
+    src/resources.qrc
 )
 
 add_executable(sudoku ${SOURCES})
@@ -28,3 +29,7 @@ target_link_libraries(sudoku PRIVATE
 )
 
 install(TARGETS sudoku DESTINATION bin)
+
+install(FILES src/sudoku.desktop DESTINATION share/applications)
+
+install(FILES src/icons/sudoku.svg DESTINATION share/icons/hicolor/scalable/apps)
