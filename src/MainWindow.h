@@ -8,6 +8,7 @@
 DWIDGET_USE_NAMESPACE
 
 class SudokuBoard;
+class SoundManager;
 
 class MainWindow : public DMainWindow
 {
@@ -39,6 +40,7 @@ private:
     DPushButton *m_btnRedo = nullptr;
     DPushButton *m_btnNotas = nullptr;
     DPushButton *m_btnNuevo = nullptr;
+    SoundManager *m_soundManager = nullptr;
 };
 
 #endif

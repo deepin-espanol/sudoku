@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "SudokuBoard.h"
+#include "SoundManager.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -10,6 +11,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : DMainWindow(parent)
 {
+    m_soundManager = new SoundManager(this);
     setupUI();
     setupMenu();
     onDificultadMedia();
@@ -120,6 +122,7 @@ void MainWindow::onNuevoJuego()
     m_board->nuevoJuego();
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
+    m_soundManager->playPlace();
 }
 
 void MainWindow::onDificultadFacil()
@@ -128,6 +131,7 @@ void MainWindow::onDificultadFacil()
     m_board->setDificultad(35);
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
+    m_soundManager->playPlace();
 }
 
 void MainWindow::onDificultadMedia()
@@ -136,6 +140,7 @@ void MainWindow::onDificultadMedia()
     m_board->setDificultad(45);
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
+    m_soundManager->playPlace();
 }
 
 void MainWindow::onDificultadDificil()
@@ -144,25 +149,31 @@ void MainWindow::onDificultadDificil()
     m_board->setDificultad(55);
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
+    m_soundManager->playPlace();
 }
 
 void MainWindow::onUndo()
 {
-    m_board->undo();
+    if (m_board->undo())
+        m_soundManager->playPlace();
 }
 
 void MainWindow::onRedo()
 {
-    m_board->redo();
+    if (m_board->redo())
+        m_soundManager->playPlace();
 }
 
 void MainWindow::onNotasToggle()
 {
     m_board->setNotasMode(!m_board->notasMode());
+    m_soundManager->playPlace();
 }
 
 void MainWindow::onJuegoCompletado(int tiempo)
 {
+    m_soundManager->playVictory();
+
     int mins = tiempo / 60;
     int segs = tiempo % 60;
     QString timeStr = QString("%1:%2")
