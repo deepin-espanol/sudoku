@@ -20,6 +20,8 @@ set(SOURCES
     src/SudokuCell.h
     src/SoundManager.cpp
     src/SoundManager.h
+    src/SettingsDialog.cpp
+    src/SettingsDialog.h
     src/resources.qrc
 )
 

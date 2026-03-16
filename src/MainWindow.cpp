@@ -1,7 +1,11 @@
 #include "MainWindow.h"
 #include "SudokuBoard.h"
 #include "SoundManager.h"
+#include "SettingsDialog.h"
 
+#include <DTitlebar>
+#include <DWidgetUtil>
+#include <DAboutDialog>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMenu>
@@ -14,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_soundManager = new SoundManager(this);
     setupUI();
     setupMenu();
+    updateTitlebarMenu();
     onDificultadMedia();
 }
 
@@ -117,6 +122,31 @@ void MainWindow::setupMenu()
     connect(salir, &QAction::triggered, this, &QWidget::close);
 }
 
+void MainWindow::updateTitlebarMenu()
+{
+    auto *tb = titlebar();
+    auto *menu = tb->menu();
+
+    if (!menu) {
+        menu = new QMenu(this);
+        tb->setMenu(menu);
+    }
+
+    auto *settingsAction = menu->addAction(tr("Preferencias..."));
+    connect(settingsAction, &QAction::triggered, this, &MainWindow::onAbrirSettings);
+
+    auto *aboutAction = menu->addAction(tr("Acerca de"));
+    connect(aboutAction, &QAction::triggered, this, [this]() {
+        auto *about = new DAboutDialog(this);
+        about->setProductName(tr("Sudoku"));
+        about->setVersion(tr("0.2.0"));
+        about->setDescription(tr("Un juego de Sudoku para Deepin.\n\nGenera puzzles con solucion unica\ny tres niveles de dificultad."));
+        about->setWebsiteName("github.com/deepines/sudoku");
+        about->exec();
+        about->deleteLater();
+    });
+}
+
 void MainWindow::onNuevoJuego()
 {
     m_board->nuevoJuego();
@@ -191,4 +221,16 @@ void MainWindow::onTiempoActualizado(int segundos)
     m_labelTimer->setText(QString("%1:%2")
         .arg(mins, 2, 10, QChar('0'))
         .arg(secs, 2, 10, QChar('0')));
+}
+
+void MainWindow::onAbrirSettings()
+{
+    if (!m_settingsDialog) {
+        m_settingsDialog = new SettingsDialog(m_soundManager, this);
+    }
+    m_settingsDialog->show();
+    m_settingsDialog->raise();
+    m_settingsDialog->activateWindow();
+
+    Dtk::Widget::moveToCenter(m_settingsDialog);
 }

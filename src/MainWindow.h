@@ -9,6 +9,7 @@ DWIDGET_USE_NAMESPACE
 
 class SudokuBoard;
 class SoundManager;
+class SettingsDialog;
 
 class MainWindow : public DMainWindow
 {
@@ -28,10 +29,12 @@ private slots:
     void onNotasToggle();
     void onJuegoCompletado(int tiempo);
     void onTiempoActualizado(int segundos);
+    void onAbrirSettings();
 
 private:
     void setupUI();
     void setupMenu();
+    void updateTitlebarMenu();
 
     SudokuBoard *m_board = nullptr;
     DLabel *m_labelDificultad = nullptr;
@@ -41,6 +44,7 @@ private:
     DPushButton *m_btnNotas = nullptr;
     DPushButton *m_btnNuevo = nullptr;
     SoundManager *m_soundManager = nullptr;
+    SettingsDialog *m_settingsDialog = nullptr;
 };
 
 #endif
