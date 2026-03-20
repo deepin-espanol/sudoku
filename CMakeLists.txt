@@ -41,3 +41,6 @@ install(TARGETS sudoku DESTINATION bin)
 install(FILES src/sudoku.desktop DESTINATION share/applications)
 
 install(FILES src/icons/sudoku.svg DESTINATION share/icons/hicolor/scalable/apps)
+
+install(DIRECTORY src/translations/ DESTINATION share/sudoku/translations
+    FILES_MATCHING PATTERN "*.qm")
