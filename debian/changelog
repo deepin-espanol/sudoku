@@ -1,0 +1,23 @@
+sudoku (0.2.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Full code refactor: custom SudokuCell widget, proper input validation,
+    conflict highlighting, win detection.
+  * New features: undo/redo, pencil marks (notas mode), game timer.
+  * Added SoundManager with procedural 8-bit sound effects.
+  * Added DTK-themed SettingsDialog for audio preferences.
+  * Added internationalization with 18 languages.
+  * Added proper Debian packaging, .desktop file, and app icon.
+  * Added CI/CD pipelines (GitHub Actions) for multi-arch builds.
+  * Added linglong.yaml for containerized distribution.
+  * Removed dead CellWidget class.
+  * Updated to Qt6 Multimedia for audio support.
+
+ -- Deepin Developers <dev@deepin.org>  Mon, 28 Jul 2026 12:00:00 -0300
+
+sudoku (0.1.0-1) unstable; urgency=medium
+
+  * Initial release for Deepin.
+  * Basic Sudoku game with puzzle generation and 3 difficulty levels.
+
+ -- Deepin Developers <dev@deepin.org>  Mon, 01 Jan 2024 12:00:00 -0300
