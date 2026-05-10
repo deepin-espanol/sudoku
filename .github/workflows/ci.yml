@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          qt6-base-dev \
+          qt6-multimedia-dev \
+          libdtk6widget-dev \
+          g++ \
+          lrelease
+
+    - name: Configure
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build -j$(nproc)
+
+    - name: Package .deb
+      run: |
+        mkdir -p packaging/sudoku/usr
+        cmake --install build --prefix packaging/sudoku/usr
+        mkdir -p packaging/sudoku/DEBIAN
+        cat > packaging/sudoku/DEBIAN/control <<EOF
+        Package: sudoku
+        Version: 0.2.0
+        Section: games
+        Priority: optional
+        Architecture: amd64
+        Maintainer: Deepin Developers <dev@deepin.org>
+        Depends: libqt6widgets6, libqt6multimedia6, libdtk6widget6
+        Description: Classic Sudoku puzzle game
+         A classic Sudoku puzzle game for Deepin.
+        EOF
+        dpkg-deb --build packaging/sudoku sudoku-amd64.deb
+
+    - name: Upload .deb artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sudoku-amd64.deb
+        path: sudoku-amd64.deb

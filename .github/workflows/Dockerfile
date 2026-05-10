@@ -1,0 +1,14 @@
+FROM linuxdeepin/deepin:crimson
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        cmake \
+        qt6-base-dev \
+        qt6-multimedia-dev \
+        libdtk6widget-dev \
+        g++ \
+        lrelease \
+        dpkg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
