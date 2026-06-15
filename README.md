@@ -34,3 +34,12 @@ O si se instalo globalmente:
 sudo make install
 sudoku
 ```
+
+## Controles
+
+| Accion | Tecla |
+|--------|-------|
+| Ingresar numero | `1` - `9` |
+| Navegar entre celdas | Click o `Tab` |
+| Cambiar dificultad | Juego > Facil / Media / Dificil |
+| Nuevo juego | Juego > Nuevo juego |
