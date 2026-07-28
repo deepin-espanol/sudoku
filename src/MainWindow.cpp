@@ -5,30 +5,28 @@
 
 #include <DTitlebar>
 #include <DWidgetUtil>
-#include <DAboutDialog>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
-#include <QMenuBar>
+#include <QShortcut>
 
 MainWindow::MainWindow(QWidget *parent)
     : DMainWindow(parent)
 {
     m_soundManager = new SoundManager(this);
     setupUI();
-    setupMenu();
+    setupShortcuts();
     updateTitlebarMenu();
-    onDificultadMedia();
+    m_labelDificultad->setText(tr("Dificultad: Media"));
 }
 
 MainWindow::~MainWindow() = default;
 
 void MainWindow::setupUI()
 {
-    resize(520, 600);
+    setFixedSize(520, 600);
     setWindowTitle(tr("Sudoku"));
-    setMinimumSize(480, 540);
 
     auto *centralWidget = new QWidget(this);
     auto *mainLayout = new QVBoxLayout(centralWidget);
@@ -53,6 +51,12 @@ void MainWindow::setupUI()
     m_btnRedo = new DPushButton(tr("Rehacer"));
     m_btnNotas = new DPushButton(tr("Notas"));
 
+    m_comboDificultad = new DComboBox();
+    m_comboDificultad->addItem(tr("Facil (55 celdas)"), 55);
+    m_comboDificultad->addItem(tr("Media (45 celdas)"), 45);
+    m_comboDificultad->addItem(tr("Dificil (35 celdas)"), 35);
+    m_comboDificultad->setCurrentIndex(1);
+
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
     m_btnNotas->setCheckable(true);
@@ -61,6 +65,7 @@ void MainWindow::setupUI()
     toolLayout->addWidget(m_btnUndo);
     toolLayout->addWidget(m_btnRedo);
     toolLayout->addWidget(m_btnNotas);
+    toolLayout->addWidget(m_comboDificultad);
     toolLayout->addStretch();
     mainLayout->addLayout(toolLayout);
 
@@ -73,6 +78,8 @@ void MainWindow::setupUI()
     connect(m_btnUndo, &DPushButton::clicked, this, &MainWindow::onUndo);
     connect(m_btnRedo, &DPushButton::clicked, this, &MainWindow::onRedo);
     connect(m_btnNotas, &DPushButton::clicked, this, &MainWindow::onNotasToggle);
+    connect(m_comboDificultad, QOverload<int>::of(&DComboBox::currentIndexChanged),
+            this, &MainWindow::onDificultadCambiada);
 
     connect(m_board, &SudokuBoard::movimientoHecho, this, [this]() {
         m_btnUndo->setEnabled(m_board->canUndo());
@@ -85,41 +92,12 @@ void MainWindow::setupUI()
     });
 }
 
-void MainWindow::setupMenu()
+void MainWindow::setupShortcuts()
 {
-    auto *menuBar = this->menuBar();
-    auto *juegoMenu = menuBar->addMenu(tr("&Juego"));
-
-    auto *nuevoAction = juegoMenu->addAction(tr("&Nuevo juego"));
-    nuevoAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-    connect(nuevoAction, &QAction::triggered, this, &MainWindow::onNuevoJuego);
-
-    juegoMenu->addSeparator();
-
-    auto *facil = juegoMenu->addAction(tr("&Facil (55 celdas)"));
-    connect(facil, &QAction::triggered, this, &MainWindow::onDificultadFacil);
-
-    auto *media = juegoMenu->addAction(tr("&Media (45 celdas)"));
-    connect(media, &QAction::triggered, this, &MainWindow::onDificultadMedia);
-
-    auto *dificil = juegoMenu->addAction(tr("&Dificil (35 celdas)"));
-    connect(dificil, &QAction::triggered, this, &MainWindow::onDificultadDificil);
-
-    juegoMenu->addSeparator();
-
-    auto *deshacer = juegoMenu->addAction(tr("&Deshacer"));
-    deshacer->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Z));
-    connect(deshacer, &QAction::triggered, this, &MainWindow::onUndo);
-
-    auto *rehacer = juegoMenu->addAction(tr("&Rehacer"));
-    rehacer->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Z));
-    connect(rehacer, &QAction::triggered, this, &MainWindow::onRedo);
-
-    juegoMenu->addSeparator();
-
-    auto *salir = juegoMenu->addAction(tr("&Salir"));
-    salir->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q));
-    connect(salir, &QAction::triggered, this, &QWidget::close);
+    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_N), this, [this]() { onNuevoJuego(); });
+    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Z), this, [this]() { onUndo(); });
+    new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Z), this, [this]() { onRedo(); });
+    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this, [this]() { close(); });
 }
 
 void MainWindow::updateTitlebarMenu()
@@ -134,17 +112,6 @@ void MainWindow::updateTitlebarMenu()
 
     auto *settingsAction = menu->addAction(tr("Preferencias..."));
     connect(settingsAction, &QAction::triggered, this, &MainWindow::onAbrirSettings);
-
-    auto *aboutAction = menu->addAction(tr("Acerca de"));
-    connect(aboutAction, &QAction::triggered, this, [this]() {
-        auto *about = new DAboutDialog(this);
-        about->setProductName(tr("Sudoku"));
-        about->setVersion(tr("0.2.0"));
-        about->setDescription(tr("Un juego de Sudoku para Deepin.\n\nGenera puzzles con solucion unica\ny tres niveles de dificultad."));
-        about->setWebsiteName("github.com/deepines/sudoku");
-        about->exec();
-        about->deleteLater();
-    });
 }
 
 void MainWindow::onNuevoJuego()
@@ -155,28 +122,17 @@ void MainWindow::onNuevoJuego()
     m_soundManager->playPlace();
 }
 
-void MainWindow::onDificultadFacil()
+void MainWindow::onDificultadCambiada(int index)
 {
-    m_labelDificultad->setText(tr("Dificultad: Facil"));
-    m_board->setDificultad(55);
-    m_btnUndo->setEnabled(false);
-    m_btnRedo->setEnabled(false);
-    m_soundManager->playPlace();
-}
-
-void MainWindow::onDificultadMedia()
-{
-    m_labelDificultad->setText(tr("Dificultad: Media"));
-    m_board->setDificultad(45);
-    m_btnUndo->setEnabled(false);
-    m_btnRedo->setEnabled(false);
-    m_soundManager->playPlace();
-}
-
-void MainWindow::onDificultadDificil()
-{
-    m_labelDificultad->setText(tr("Dificultad: Dificil"));
-    m_board->setDificultad(35);
+    QString dificultad;
+    int celdas = 45;
+    switch (index) {
+    case 0: dificultad = tr("Facil"); celdas = 55; break;
+    case 2: dificultad = tr("Dificil"); celdas = 35; break;
+    default: dificultad = tr("Media"); celdas = 45; break;
+    }
+    m_labelDificultad->setText(tr("Dificultad: %1").arg(dificultad));
+    m_board->setDificultad(celdas);
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
     m_soundManager->playPlace();

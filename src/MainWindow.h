@@ -4,6 +4,7 @@
 #include <DMainWindow>
 #include <DLabel>
 #include <DPushButton>
+#include <DComboBox>
 
 DWIDGET_USE_NAMESPACE
 
@@ -21,19 +22,17 @@ public:
 
 private slots:
     void onNuevoJuego();
-    void onDificultadFacil();
-    void onDificultadMedia();
-    void onDificultadDificil();
     void onUndo();
     void onRedo();
     void onNotasToggle();
+    void onDificultadCambiada(int index);
     void onJuegoCompletado(int tiempo);
     void onTiempoActualizado(int segundos);
     void onAbrirSettings();
 
 private:
     void setupUI();
-    void setupMenu();
+    void setupShortcuts();
     void updateTitlebarMenu();
 
     SudokuBoard *m_board = nullptr;
@@ -43,6 +42,7 @@ private:
     DPushButton *m_btnRedo = nullptr;
     DPushButton *m_btnNotas = nullptr;
     DPushButton *m_btnNuevo = nullptr;
+    DComboBox *m_comboDificultad = nullptr;
     SoundManager *m_soundManager = nullptr;
     SettingsDialog *m_settingsDialog = nullptr;
 };
