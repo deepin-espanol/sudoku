@@ -42,9 +42,9 @@ public:
     void limpiarConflicto(int fila, int col, int num);
 
 signals:
-    void conflictoDetectado(int fila, int col, int num);
-    void movimientoHecho();
     void juegoCompletado(int tiempo);
+    void movimientoHecho();
+    void conflictoDetectado(int fila, int col, int num);
     void notasModeChanged(bool enabled);
     void tiempoActualizado(int segundos);
 
@@ -72,6 +72,7 @@ private:
     QGridLayout *m_gridLayout = nullptr;
     int m_celdasVisibles = 45;
     bool m_notasMode = false;
+    bool m_ganado = false;
 
     QStack<SudokuMove> m_undoStack;
     QStack<SudokuMove> m_redoStack;

@@ -5,7 +5,7 @@ Juego de Sudoku desarrollado con Qt6 y Deepin Tool Kit (DTK6) para Deepin Linux.
 ## Caracteristicas
 
 - Generacion automatica de puzzles con solucion unica
-- 3 niveles de dificultad: Facil (35 celdas), Media (45 celdas), Dificil (55 celdas)
+- 3 niveles de dificultad: Facil (55 celdas), Media (45 celdas), Dificil (35 celdas)
 - Interfaz limpia y nativa de Deepin
 
 ## Dependencias

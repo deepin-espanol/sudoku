@@ -48,8 +48,8 @@ void SudokuBoard::nuevoJuego()
     for (int i = 0; i < TAMANIO; ++i) {
         for (int j = 0; j < TAMANIO; ++j) {
             auto *cell = m_celdas[i][j];
-            cell->setNumber(m_solucion[i][j]);
             cell->setReadOnly(m_esPista[i][j]);
+            cell->setNumber(m_esPista[i][j] ? m_solucion[i][j] : 0);
             cell->setConflict(false);
             cell->clearNotes();
             actualizarEstadoCelda(i, j);

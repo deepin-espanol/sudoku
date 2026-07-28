@@ -96,13 +96,13 @@ void MainWindow::setupMenu()
 
     juegoMenu->addSeparator();
 
-    auto *facil = juegoMenu->addAction(tr("&Facil (35 celdas)"));
+    auto *facil = juegoMenu->addAction(tr("&Facil (55 celdas)"));
     connect(facil, &QAction::triggered, this, &MainWindow::onDificultadFacil);
 
     auto *media = juegoMenu->addAction(tr("&Media (45 celdas)"));
     connect(media, &QAction::triggered, this, &MainWindow::onDificultadMedia);
 
-    auto *dificil = juegoMenu->addAction(tr("&Dificil (55 celdas)"));
+    auto *dificil = juegoMenu->addAction(tr("&Dificil (35 celdas)"));
     connect(dificil, &QAction::triggered, this, &MainWindow::onDificultadDificil);
 
     juegoMenu->addSeparator();
@@ -158,7 +158,7 @@ void MainWindow::onNuevoJuego()
 void MainWindow::onDificultadFacil()
 {
     m_labelDificultad->setText(tr("Dificultad: Facil"));
-    m_board->setDificultad(35);
+    m_board->setDificultad(55);
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
     m_soundManager->playPlace();
@@ -176,7 +176,7 @@ void MainWindow::onDificultadMedia()
 void MainWindow::onDificultadDificil()
 {
     m_labelDificultad->setText(tr("Dificultad: Dificil"));
-    m_board->setDificultad(55);
+    m_board->setDificultad(35);
     m_btnUndo->setEnabled(false);
     m_btnRedo->setEnabled(false);
     m_soundManager->playPlace();
