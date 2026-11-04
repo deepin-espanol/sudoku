@@ -16,3 +16,9 @@ debian/*.substvars
 debian/*.debhelper.log
 debian/sudoku/
 dist/
+
+# linyaps (ll-builder)
+debs/
+linglong/
+*.uab
+*.layer

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     DApplication app(argc, argv);
     app.setApplicationName("sudoku-dtk");
-    app.setApplicationVersion(QStringLiteral("0.2.1"));
+    app.setApplicationVersion(QStringLiteral("0.2.2"));
     app.setOrganizationName("deepines");
 
     // Traducciones de DTK y, encima, las del juego embebidas en :/translations
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     DAboutDialog about;
     about.setProductName(QObject::tr("Sudoku"));
     about.setProductIcon(QIcon(":/icons/sudoku.svg"));
-    about.setVersion(DApplication::buildVersion(QStringLiteral("0.2.1")));
+    about.setVersion(DApplication::buildVersion(QStringLiteral("0.2.2")));
     about.setDescription(QObject::tr("Un juego de Sudoku para Deepin.\n\nGenera puzzles con solucion unica\ny tres niveles de dificultad."));
     about.setWebsiteName(QStringLiteral("github.com/deepin-espanol/sudoku"));
     about.setWebsiteLink(QStringLiteral("https://github.com/deepin-espanol/sudoku"));
