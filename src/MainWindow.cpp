@@ -25,7 +25,7 @@ MainWindow::~MainWindow() = default;
 
 void MainWindow::setupUI()
 {
-    setFixedSize(520, 600);
+    setFixedSize(520, 660);
     setWindowTitle(tr("Sudoku"));
 
     auto *centralWidget = new QWidget(this);
@@ -61,6 +61,11 @@ void MainWindow::setupUI()
     m_btnRedo->setEnabled(false);
     m_btnNotas->setCheckable(true);
 
+    // Sin foco: asi pulsar un boton no quita la seleccion de la celda
+    for (auto *btn : {m_btnNuevo, m_btnUndo, m_btnRedo, m_btnNotas})
+        btn->setFocusPolicy(Qt::NoFocus);
+    m_comboDificultad->setFocusPolicy(Qt::NoFocus);
+
     toolLayout->addWidget(m_btnNuevo);
     toolLayout->addWidget(m_btnUndo);
     toolLayout->addWidget(m_btnRedo);
@@ -71,6 +76,27 @@ void MainWindow::setupUI()
 
     m_board = new SudokuBoard(this);
     mainLayout->addWidget(m_board, 0, Qt::AlignCenter);
+
+    // Teclado numerico en pantalla para jugar solo con el raton
+    auto *padLayout = new QHBoxLayout();
+    padLayout->setSpacing(4);
+    padLayout->addStretch();
+    for (int n = 1; n <= 9; ++n) {
+        auto *btn = new DPushButton(QString::number(n));
+        btn->setFocusPolicy(Qt::NoFocus);
+        btn->setFixedSize(40, 36);
+        connect(btn, &DPushButton::clicked, this, [this, n]() {
+            m_board->ingresarNumeroEnSeleccion(n);
+        });
+        padLayout->addWidget(btn);
+    }
+    auto *btnBorrar = new DPushButton(tr("Borrar"));
+    btnBorrar->setFocusPolicy(Qt::NoFocus);
+    btnBorrar->setFixedHeight(36);
+    connect(btnBorrar, &DPushButton::clicked, this, [this]() { m_board->borrarSeleccion(); });
+    padLayout->addWidget(btnBorrar);
+    padLayout->addStretch();
+    mainLayout->addLayout(padLayout);
 
     setCentralWidget(centralWidget);
 
@@ -86,6 +112,9 @@ void MainWindow::setupUI()
         m_btnRedo->setEnabled(m_board->canRedo());
     });
     connect(m_board, &SudokuBoard::juegoCompletado, this, &MainWindow::onJuegoCompletado);
+    connect(m_board, &SudokuBoard::conflictoDetectado, this, [this]() {
+        m_soundManager->playError();
+    });
     connect(m_board, &SudokuBoard::tiempoActualizado, this, &MainWindow::onTiempoActualizado);
     connect(m_board, &SudokuBoard::notasModeChanged, this, [this](bool enabled) {
         m_btnNotas->setChecked(enabled);

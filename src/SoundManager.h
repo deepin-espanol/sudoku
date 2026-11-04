@@ -6,6 +6,7 @@
 #include <QMediaDevices>
 #include <QByteArray>
 #include <QBuffer>
+#include <QVector>
 
 class SoundManager : public QObject
 {
@@ -29,6 +30,7 @@ public:
 private:
     void playTone(double frequency, int durationMs, double volume = 1.0);
     void playChord(const QVector<double> &frequencies, int durationMs, double volume = 1.0);
+    void playBuffer(const QByteArray &data);
 
     QByteArray generateTone(double frequency, int durationMs, double volume = 1.0) const;
     QByteArray generateChord(const QVector<double> &frequencies, int durationMs, double volume = 1.0) const;

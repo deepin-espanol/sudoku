@@ -11,7 +11,7 @@ Juego de Sudoku desarrollado con Qt6 y Deepin Tool Kit (DTK6) para Deepin Linux.
 ## Dependencias
 
 ```bash
-sudo apt install qt6-base-dev libdtk6widget-dev cmake g++
+sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev qt6-l10n-tools libdtk6widget-dev cmake g++
 ```
 
 ## Compilar
@@ -39,7 +39,13 @@ sudoku
 
 | Accion | Tecla |
 |--------|-------|
-| Ingresar numero | `1` - `9` |
-| Navegar entre celdas | Click o `Tab` |
-| Cambiar dificultad | Juego > Facil / Media / Dificil |
-| Nuevo juego | Juego > Nuevo juego |
+| Ingresar numero | `1` - `9` o teclado numerico en pantalla |
+| Borrar celda | `Supr`, `Retroceso`, `0` o boton *Borrar* |
+| Navegar entre celdas | Click o flechas |
+| Modo notas | Boton *Notas* |
+| Deshacer / Rehacer | `Ctrl+Z` / `Ctrl+Shift+Z` |
+| Cambiar dificultad | Selector Facil / Media / Dificil |
+| Nuevo juego | Boton *Nuevo* o `Ctrl+N` |
+| Salir | `Ctrl+Q` |
+
+Cada puzzle generado tiene **solucion unica**.

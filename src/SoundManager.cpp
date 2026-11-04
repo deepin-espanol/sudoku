@@ -1,6 +1,7 @@
 #include "SoundManager.h"
 
 #include <cmath>
+#include <cstdint>
 #include <QAudioFormat>
 
 SoundManager::SoundManager(QObject *parent)
@@ -56,24 +57,29 @@ void SoundManager::playError()
 void SoundManager::playVictory()
 {
     if (m_muted || !m_audioSink) return;
-    QVector<double> notes = {523.25, 659.25, 783.99, 1046.5}; // C5 E5 G5 C6
-    for (double freq : notes) {
-        playTone(freq, 150, 0.5);
-    }
+    // Arpegio C5 E5 G5 C6 en un unico buffer: reproducir los tonos uno tras
+    // otro cortaba cada nota al iniciar la siguiente y solo se oia la ultima.
+    const QVector<double> notes = {523.25, 659.25, 783.99, 1046.5};
+    QByteArray data;
+    for (double freq : notes)
+        data.append(generateTone(freq, 150, 0.5 * m_volume));
+    playBuffer(data);
 }
 
 void SoundManager::playTone(double frequency, int durationMs, double volume)
 {
     if (m_muted || !m_audioSink) return;
-    QByteArray data = generateTone(frequency, durationMs, volume * m_volume);
-    playChord({frequency}, durationMs, volume);
+    playBuffer(generateTone(frequency, durationMs, volume * m_volume));
 }
 
 void SoundManager::playChord(const QVector<double> &frequencies, int durationMs, double volume)
 {
     if (m_muted || !m_audioSink) return;
-    QByteArray data = generateChord(frequencies, durationMs, volume * m_volume);
+    playBuffer(generateChord(frequencies, durationMs, volume * m_volume));
+}
 
+void SoundManager::playBuffer(const QByteArray &data)
+{
     m_audioSink->stop();
     m_buffer->close();
     m_buffer->setData(data);

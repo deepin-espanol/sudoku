@@ -1,0 +1,11 @@
+.git
+build/
+obj-*/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.substvars
+debian/*.debhelper.log
+*.deb
+debian/sudoku/
+deepines/

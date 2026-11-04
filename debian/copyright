@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: sudoku
-Source: https://github.com/deepines/sudoku
+Source: https://github.com/deepin-espanol/sudoku
 
 Files: *
 Copyright: 2024 Deepin Developers

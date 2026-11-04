@@ -110,7 +110,7 @@ void SudokuCell::paintEvent(QPaintEvent *)
 
     if (m_number != 0) {
         QFont font = painter.font();
-        font.setPointSize(m_readOnly ? 18 : 18);
+        font.setPointSize(18);
         font.setBold(m_readOnly);
         painter.setFont(font);
 
@@ -150,33 +150,34 @@ void SudokuCell::drawNotes(QPainter &painter, const QRect &rect)
 void SudokuCell::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        setFocus();
-        emit cellClicked(m_row, m_col);
+        if (hasFocus())
+            emit cellClicked(m_row, m_col);
+        else
+            setFocus(Qt::MouseFocusReason); // focusInEvent emite cellClicked
     }
     QWidget::mousePressEvent(event);
 }
 
 void SudokuCell::keyPressEvent(QKeyEvent *event)
 {
-    if (m_readOnly) {
+    const bool esFlecha = event->key() == Qt::Key_Up || event->key() == Qt::Key_Down
+                       || event->key() == Qt::Key_Left || event->key() == Qt::Key_Right;
+    if (m_readOnly && !esFlecha) {
         QWidget::keyPressEvent(event);
         return;
     }
 
-    if (event->key() >= Qt::Key_1 && event->key() <= Qt::Key_9) {
+    if (!m_readOnly && event->key() >= Qt::Key_1 && event->key() <= Qt::Key_9) {
         int num = event->key() - Qt::Key_0;
         emit numberEntered(m_row, m_col, num);
         return;
     }
 
-    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
-        if (m_number != 0) {
-            m_number = 0;
-            m_notes.clear();
-            m_conflict = false;
-            update();
+    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace
+        || event->key() == Qt::Key_0) {
+        // El tablero borra la celda y registra el movimiento para deshacer
+        if (m_number != 0 || !m_notes.isEmpty())
             emit cellCleared(m_row, m_col);
-        }
         return;
     }
 
@@ -201,6 +202,7 @@ void SudokuCell::keyPressEvent(QKeyEvent *event)
 void SudokuCell::focusInEvent(QFocusEvent *event)
 {
     setSelected(true);
+    emit cellClicked(m_row, m_col);
     QWidget::focusInEvent(event);
 }
 

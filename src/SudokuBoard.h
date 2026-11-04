@@ -17,6 +17,7 @@ struct SudokuMove {
     int oldValue;
     int newValue;
     QSet<int> oldNotes;
+    QSet<int> newNotes;
 };
 
 class SudokuBoard : public QWidget
@@ -41,6 +42,10 @@ public:
 
     void limpiarConflicto(int fila, int col, int num);
 
+    // Entrada desde el teclado numerico en pantalla (celda seleccionada)
+    void ingresarNumeroEnSeleccion(int num);
+    void borrarSeleccion();
+
 signals:
     void juegoCompletado(int tiempo);
     void movimientoHecho();
@@ -57,6 +62,10 @@ private slots:
 private:
     void generarSolucion();
     void colocarPistas(int celdasVisibles);
+    int contarSoluciones(QVector<QVector<int>> &tablero, int limite) const;
+    void registrarMovimiento(const SudokuMove &move);
+    void aplicarEstado(int fila, int col, int valor, const QSet<int> &notas);
+    void recalcularConflictos();
     bool esValidoEnTablero(const QVector<QVector<int>> &tablero, int fila, int col, int num) const;
     bool resolver(QVector<QVector<int>> &tablero);
     bool tieneConflicto(int fila, int col) const;
@@ -81,6 +90,8 @@ private:
     QElapsedTimer m_timer;
     QTimer *m_timerTick = nullptr;
     int m_tiempoSegundos = 0;
+    int m_filaSel = -1;
+    int m_colSel = -1;
 };
 
 #endif

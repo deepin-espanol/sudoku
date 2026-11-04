@@ -3,7 +3,7 @@ version: "1"
 package:
   id: org.deepines.sudoku
   name: Sudoku
-  version: 0.2.0
+  version: 0.2.1
   kind: app
   description: Classic Sudoku puzzle game for Deepin
 
@@ -16,7 +16,7 @@ build:
   commands:
     - |
       apt-get update && \
-      apt-get install -y cmake qt6-base-dev qt6-multimedia-dev libdtk6widget-dev g++ lrelease && \
+      apt-get install -y cmake qt6-base-dev qt6-multimedia-dev libdtk6widget-dev qt6-tools-dev qt6-l10n-tools g++ && \
       cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/apps/org.deepines.sudoku/files && \
       cmake --build build -j$(nproc) && \
       cmake --install build

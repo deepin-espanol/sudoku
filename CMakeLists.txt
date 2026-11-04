@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(sudoku VERSION 0.2.0 LANGUAGES CXX)
+project(sudoku VERSION 0.2.1 LANGUAGES CXX)
+
+include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,14 +35,15 @@ target_link_libraries(sudoku PRIVATE
     Dtk6::Widget
 )
 
-# Translations are compiled manually via lrelease
-# qt6_add_translations(sudoku src/translations/*.ts)
+# Compila los .ts y los embebe como recursos en :/translations (ver main.cpp)
+qt_add_translations(sudoku
+    TS_FILES
+        src/translations/sudoku_en.ts
+        src/translations/sudoku_es.ts
+    RESOURCE_PREFIX "/translations"
+)
 
-install(TARGETS sudoku DESTINATION bin)
-
-install(FILES src/sudoku.desktop DESTINATION share/applications)
-
-install(FILES src/icons/sudoku.svg DESTINATION share/icons/hicolor/scalable/apps)
-
-install(DIRECTORY src/translations/ DESTINATION share/sudoku/translations
-    FILES_MATCHING PATTERN "*.qm")
+install(TARGETS sudoku RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES src/sudoku.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES src/icons/sudoku.svg
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)

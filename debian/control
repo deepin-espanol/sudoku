@@ -1,14 +1,18 @@
 Source: sudoku
 Section: games
 Priority: optional
-Maintainer: Deepin Developers <dev@deepin.org>
+Maintainer: Deepin en Español <developers@deepinenespanol.org>
 Build-Depends: debhelper-compat (= 13),
                cmake (>= 3.16),
                qt6-base-dev (>= 6.4),
                qt6-multimedia-dev (>= 6.4),
+               qt6-tools-dev,
+               qt6-tools-dev-tools,
+               qt6-l10n-tools,
                libdtk6widget-dev (>= 6.0)
 Standards-Version: 4.6.2
-Homepage: https://github.com/deepines/sudoku
+Homepage: https://github.com/deepin-espanol/sudoku
+Rules-Requires-Root: no
 
 Package: sudoku
 Architecture: any
@@ -16,5 +20,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Classic Sudoku puzzle game for Deepin
  A classic Sudoku puzzle game with three difficulty levels
  (Easy, Medium, Hard). Features automatic puzzle generation
- with unique solutions, pencil marks, undo/redo, and a timer.
+ with guaranteed unique solutions, pencil marks, undo/redo, an
+ on-screen number pad and a timer.
  Designed for the Deepin desktop environment.
