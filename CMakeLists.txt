@@ -36,7 +36,10 @@ target_link_libraries(sudoku PRIVATE
 )
 
 # Compila los .ts y los embebe como recursos en :/translations (ver main.cpp)
+# IMMEDIATE_CALL: la llamada diferida pierde las comillas y falla con rutas
+# que contienen espacios (las traducciones no se incrustaban)
 qt_add_translations(sudoku
+    IMMEDIATE_CALL
     TS_FILES
         src/translations/sudoku_en.ts
         src/translations/sudoku_es.ts
