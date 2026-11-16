@@ -1,7 +1,7 @@
 Source: sudoku
 Section: games
 Priority: optional
-Maintainer: Deepin en Español <developers@deepinenespanol.org>
+Maintainer: Alvaro Samudio <alvarosamudio@protonmail.com>
 Build-Depends: debhelper-compat (= 13),
                cmake (>= 3.16),
                qt6-base-dev (>= 6.4),
@@ -16,7 +16,7 @@ Rules-Requires-Root: no
 
 Package: sudoku
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, hicolor-icon-theme
 Description: Classic Sudoku puzzle game for Deepin
  A classic Sudoku puzzle game with three difficulty levels
  (Easy, Medium, Hard). Features automatic puzzle generation
